@@ -1,0 +1,83 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorAccent"
+    tools:context="com.sankar.translatorapp.Chat">
+
+    <FrameLayout
+        android:id="@+id/chat_box_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/chatbox_gradient">
+
+        <ProgressBar
+            android:id="@+id/translation_progress"
+            android:layout_width="70dp"
+            android:layout_gravity="center"
+            android:layout_height="70dp" />
+
+        <FrameLayout
+            android:id="@+id/chat_box_message"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/chat_box_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="Say Something"
+                android:textColor="@color/colorAccent"
+                android:textSize="24dp" />
+
+            <ImageView
+                android:id="@+id/chat_box_remove_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|top"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:src="@drawable/ic_close_white_24dp"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/chat_box_check_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_margin="10dp"
+                android:src="@drawable/ic_check_white_36dp"
+                app:backgroundTint="@color/colorPrimary"
+                app:fabSize="mini"
+                android:clickable="true"
+                app:rippleColor="@color/colorPrimaryDark" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/chat_box_audio"
+            android:padding="12dp"
+            android:layout_width="match_parent"
+            android:background="@drawable/chatbox_gradient"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/chat_box_mic_btn"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:clickable="true"
+                android:elevation="5dp"
+                android:src="@drawable/ic_mic_white_24dp"
+                app:backgroundTint="@color/colorPrimaryDark"
+                app:rippleColor="@color/colorPrimary" />
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+</LinearLayout>
