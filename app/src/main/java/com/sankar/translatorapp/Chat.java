@@ -2,13 +2,10 @@ package com.sankar.translatorapp;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.DisplayMetrics;
@@ -22,15 +19,18 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.Translate.TranslateOption;
+import com.google.cloud.translate.TranslateOptions;
+import com.google.cloud.translate.Translation;
 
-public class Chat extends Fragment implements RecognitionListener {
+public class Chat extends Fragment {
 
     // chat modes
     private static final int ME = 0;
@@ -49,7 +49,7 @@ public class Chat extends Fragment implements RecognitionListener {
     private FrameLayout chatBoxContainer;
     private FrameLayout chatBoxMessage;
     private FrameLayout chatBoxAudio;
-    private TextView chatBoxText;
+    private EditText chatBoxText;
     private ImageView chatBoxRemoveBtn;
     private FloatingActionButton chatBoxMicBtn;
     private FloatingActionButton chatBoxCheckBtn;
@@ -64,8 +64,6 @@ public class Chat extends Fragment implements RecognitionListener {
 
     private GestureDetectorCompat gestureDetector;
     private OnFragmentInteractionListener mListener;
-    private SpeechRecognizer speech = null;
-    private Intent recognizerIntent;
 
     public Chat() {}
 
@@ -94,23 +92,31 @@ public class Chat extends Fragment implements RecognitionListener {
         screenHeight = metrics.heightPixels;
         actionBarHeight = getActionBarHeight();
 
-        speech = SpeechRecognizer.createSpeechRecognizer(getActivity());
-        speech.setRecognitionListener(this);
-        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,
-                "en");
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
-                getActivity().getPackageName());
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-
         autoSetChatBoxSize(orientation);
         setMode(ME);
         micView();
         setButtonClickListeners();
         setChatBoxEventListeners();
         setChatFragmentEventListeners();
+        //new TranslateTask().execute();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    TranslateOptions options = TranslateOptions.newBuilder().setApiKey("")
+                            .build();
+                    Translate translate = options.getService();
+                    final Translation translation =
+                            translate.translate("Hello World",
+                                    Translate.TranslateOption.targetLanguage("ru"));
+                    Log.i("RUSSIAN", translation.getTranslatedText());
+                } catch (Exception e){
+                    Log.i("ERROR", e.toString());
+                }
+
+                return null;
+            }
+        }.execute();
     }
 
     // Below methods change the chat box view mode(send message, receive message, mic, loading)
@@ -154,7 +160,6 @@ public class Chat extends Fragment implements RecognitionListener {
                 chatBoxAudio.startAnimation(AnimationUtils
                         .loadAnimation(getActivity(), R.anim.fade_out));
                 sendMessageView();
-                speech.startListening(recognizerIntent);
             }
         });
 
@@ -164,7 +169,6 @@ public class Chat extends Fragment implements RecognitionListener {
                 chatBoxAudio.startAnimation(AnimationUtils
                         .loadAnimation(getActivity(), R.anim.fade_in));
                 micView();
-                speech.stopListening();
             }
         });
 
@@ -414,97 +418,6 @@ public class Chat extends Fragment implements RecognitionListener {
         mListener = null;
     }
 
-    @Override
-    public void onReadyForSpeech(Bundle bundle) {
-        Log.i("APP", "Ready for speech!");
-    }
-
-    @Override
-    public void onBeginningOfSpeech() {
-
-    }
-
-    @Override
-    public void onRmsChanged(float v) {
-
-    }
-
-    @Override
-    public void onBufferReceived(byte[] bytes) {
-
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-        Log.i("APP", "End of speech!");
-    }
-
-    @Override
-    public void onError(int i) {
-        Log.i("APP", getErrorText(i));
-    }
-
-    @Override
-    public void onResults(Bundle bundle) {
-        ArrayList<String> matches = bundle
-                .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        String text = "";
-        for (String result : matches)
-            text += result + "\n";
-
-        chatBoxText.setText(text);
-    }
-
-    @Override
-    public void onPartialResults(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onEvent(int i, Bundle bundle) {
-
-    }
-
-    public String getErrorText(int errorCode) {
-        String message;
-        switch (errorCode) {
-            case SpeechRecognizer.ERROR_AUDIO:
-                message = "Audio recording error";
-                break;
-            case SpeechRecognizer.ERROR_CLIENT:
-                message = "Client side error";
-                break;
-            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                message = "Insufficient permissions";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK:
-                message = "Network error";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                message = "Network timeout";
-                break;
-            case SpeechRecognizer.ERROR_NO_MATCH:
-                message = "No match";
-                break;
-            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                message = "RecognitionService busy";
-                break;
-            case SpeechRecognizer.ERROR_SERVER:
-                message = "error from server";
-                break;
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                message = "No speech input";
-                chatBoxAudio.startAnimation(AnimationUtils
-                        .loadAnimation(getActivity(), R.anim.fade_in));
-                micView();
-                break;
-            default:
-                message = "Didn't understand, please try again.";
-                break;
-        }
-        return message;
-    }
-
     private final class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
@@ -586,6 +499,30 @@ public class Chat extends Fragment implements RecognitionListener {
             return true;
         }
 
+    }
+
+    private class TranslateTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            Translate translate = TranslateOptions.getDefaultInstance().getService();
+
+            // The text to translate
+            String text = "Hello, world!";
+
+            // Translates some text into Russian
+            Translation translation =
+                    translate.translate(
+                            "Hello World",
+                            TranslateOption.sourceLanguage("en"),
+                            TranslateOption.targetLanguage("ru"));
+            return translation.getTranslatedText();
+        }
+
+        @Override
+        protected void onPostExecute(final String translated) {
+            Log.i("RUSSIAN", translated);
+        }
     }
 
     /**

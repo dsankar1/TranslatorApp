@@ -25,10 +25,10 @@
             android:layout_height="match_parent"
             android:padding="12dp">
 
-            <TextView
+            <EditText
                 android:id="@+id/chat_box_text"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Say Something"
                 android:textColor="@color/colorAccent"
@@ -39,7 +39,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|top"
-                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:src="@drawable/ic_close_white_24dp"/>
 
@@ -66,14 +65,15 @@
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/chat_box_mic_btn"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:layout_gravity="center"
                 android:layout_margin="3dp"
                 android:clickable="true"
                 android:elevation="5dp"
                 android:src="@drawable/ic_mic_white_24dp"
                 app:backgroundTint="@color/colorPrimaryDark"
+                app:fabSize="normal"
                 app:rippleColor="@color/colorPrimary" />
 
         </FrameLayout>
