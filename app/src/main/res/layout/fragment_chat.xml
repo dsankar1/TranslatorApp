@@ -27,32 +27,31 @@
 
             <EditText
                 android:id="@+id/chat_box_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="Say Something"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="14dp"
+                android:text="Hello World"
                 android:textColor="@color/colorAccent"
+                android:background="@null"
                 android:textSize="24dp" />
 
             <ImageView
                 android:id="@+id/chat_box_remove_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="right|top"
                 android:clickable="true"
                 android:src="@drawable/ic_close_white_24dp"/>
 
-            <android.support.design.widget.FloatingActionButton
+            <ImageView
                 android:id="@+id/chat_box_check_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_margin="10dp"
-                android:src="@drawable/ic_check_white_36dp"
-                app:backgroundTint="@color/colorPrimary"
-                app:fabSize="mini"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="right|top"
                 android:clickable="true"
-                app:rippleColor="@color/colorPrimaryDark" />
+                android:src="@drawable/ic_check_white_36dp"/>
 
         </FrameLayout>
 

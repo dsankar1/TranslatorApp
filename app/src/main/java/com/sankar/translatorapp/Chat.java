@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.cloud.translate.Translate;
-import com.google.cloud.translate.Translate.TranslateOption;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 
@@ -52,7 +51,7 @@ public class Chat extends Fragment {
     private EditText chatBoxText;
     private ImageView chatBoxRemoveBtn;
     private FloatingActionButton chatBoxMicBtn;
-    private FloatingActionButton chatBoxCheckBtn;
+    private ImageView chatBoxCheckBtn;
     private ProgressBar translationProgress;
 
     // Information about UI
@@ -98,25 +97,7 @@ public class Chat extends Fragment {
         setButtonClickListeners();
         setChatBoxEventListeners();
         setChatFragmentEventListeners();
-        //new TranslateTask().execute();
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    TranslateOptions options = TranslateOptions.newBuilder().setApiKey("")
-                            .build();
-                    Translate translate = options.getService();
-                    final Translation translation =
-                            translate.translate("Hello World",
-                                    Translate.TranslateOption.targetLanguage("ru"));
-                    Log.i("RUSSIAN", translation.getTranslatedText());
-                } catch (Exception e){
-                    Log.i("ERROR", e.toString());
-                }
-
-                return null;
-            }
-        }.execute();
+        chatBoxText.setShowSoftInputOnFocus(false);
     }
 
     // Below methods change the chat box view mode(send message, receive message, mic, loading)
@@ -132,6 +113,7 @@ public class Chat extends Fragment {
         chatBoxMessage.setVisibility(View.VISIBLE);
         chatBoxCheckBtn.setVisibility(View.VISIBLE);
         chatBoxRemoveBtn.setVisibility(View.GONE);
+        chatBoxText.setEnabled(false);
         hideProgress();
         viewMode = RECEIVE_MESSAGE_VIEW;
     }
@@ -141,6 +123,7 @@ public class Chat extends Fragment {
         chatBoxMessage.setVisibility(View.VISIBLE);
         chatBoxCheckBtn.setVisibility(View.GONE);
         chatBoxRemoveBtn.setVisibility(View.VISIBLE);
+        chatBoxText.setEnabled(true);
         hideProgress();
         viewMode = SEND_MESSAGE_VIEW;
     }
@@ -159,6 +142,8 @@ public class Chat extends Fragment {
             public void onClick(View view) {
                 chatBoxAudio.startAnimation(AnimationUtils
                         .loadAnimation(getActivity(), R.anim.fade_out));
+                String defaultMessage = mode == ME ? "Hello World" : "Hola Mundo";
+                chatBoxText.setText(defaultMessage);
                 sendMessageView();
             }
         });
@@ -188,6 +173,7 @@ public class Chat extends Fragment {
         chatBoxContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (viewMode == LOADING_VIEW) return true;
                 gestureDetector.onTouchEvent(motionEvent);
                 if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
                     Log.i("Motion Up", "Motion Up");
@@ -210,6 +196,7 @@ public class Chat extends Fragment {
         chatContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (viewMode == LOADING_VIEW) return true;
                 int x = (int) motionEvent.getX();
                 int y = (int) motionEvent.getY();
 
@@ -352,7 +339,7 @@ public class Chat extends Fragment {
                 .loadAnimation(getActivity(), R.anim.slide_up));
         chatContainer.setGravity(Gravity.TOP);
         chatBoxContainer.setRotation(180);
-        if (viewMode == SEND_MESSAGE_VIEW) receiveMessageView();
+        //if (viewMode == SEND_MESSAGE_VIEW) receiveMessageView();
     }
 
     private void slideChatBoxDown() {
@@ -360,21 +347,18 @@ public class Chat extends Fragment {
                 .loadAnimation(getActivity(), R.anim.slide_down));
         chatContainer.setGravity(Gravity.BOTTOM);
         chatBoxContainer.setRotation(0);
-        if (viewMode == SEND_MESSAGE_VIEW) receiveMessageView();
     }
 
     private void slideChatBoxLeft() {
         chatBoxContainer.startAnimation(AnimationUtils
                 .loadAnimation(getActivity(), R.anim.slide_left));
         chatContainer.setGravity(Gravity.LEFT);
-        if (viewMode == SEND_MESSAGE_VIEW) receiveMessageView();
     }
 
     private void slideChatBoxRight() {
         chatBoxContainer.startAnimation(AnimationUtils
                 .loadAnimation(getActivity(), R.anim.slide_right));
         chatContainer.setGravity(Gravity.RIGHT);
-        if (viewMode == SEND_MESSAGE_VIEW) receiveMessageView();
     }
 
     private void showProgress() {
@@ -438,6 +422,7 @@ public class Chat extends Fragment {
                         if (x < 16) x = 16;
                         if (((float)x / (float)screenWidth) > .2) {
                             slideChatBoxLeft();
+                            if (viewMode != MIC_VIEW) new TranslateTask("es").execute();
                             setMode(YOU);
                             x = 16;
                         }
@@ -447,6 +432,7 @@ public class Chat extends Fragment {
                         if (x < 16) x = 16;
                         if (((float)x / (float)screenWidth) > .2) {
                             slideChatBoxRight();
+                            if (viewMode != MIC_VIEW) new TranslateTask("en").execute();
                             setMode(ME);
                             x = 16;
                         }
@@ -458,6 +444,7 @@ public class Chat extends Fragment {
                         if (x < 16) x = 16;
                         if (((float)x / (float)screenWidth) > .2) {
                             slideChatBoxLeft();
+                            if (viewMode != MIC_VIEW) new TranslateTask("en").execute();
                             setMode(ME);
                             x = 16;
                         }
@@ -467,6 +454,7 @@ public class Chat extends Fragment {
                         if (x < 16) x = 16;
                         if (((float)x / (float)screenWidth) > .2) {
                             slideChatBoxRight();
+                            if (viewMode != MIC_VIEW) new TranslateTask("es").execute();
                             setMode(YOU);
                             x = 16;
                         }
@@ -478,6 +466,7 @@ public class Chat extends Fragment {
                         if (y < 16) y = 16;
                         if (((float)y / (float)screenHeight) > .2) {
                             slideChatBoxUp();
+                            if (viewMode != MIC_VIEW) new TranslateTask("es").execute();
                             setMode(YOU);
                             y = 16;
                         }
@@ -487,6 +476,7 @@ public class Chat extends Fragment {
                         if (y < 16) y = 16;
                         if (((float)y / (float)screenHeight) > .2) {
                             slideChatBoxDown();
+                            if (viewMode != MIC_VIEW) new TranslateTask("en").execute();
                             setMode(ME);
                             y = 16;
                         }
@@ -503,25 +493,37 @@ public class Chat extends Fragment {
 
     private class TranslateTask extends AsyncTask<Void, Void, String> {
 
+        private String language;
+        public TranslateTask(String language) {
+            this.language = language;
+        }
+
+        @Override
+        protected  void onPreExecute() {
+            loadingView();
+        }
+
         @Override
         protected String doInBackground(Void... voids) {
-            Translate translate = TranslateOptions.getDefaultInstance().getService();
-
-            // The text to translate
-            String text = "Hello, world!";
-
-            // Translates some text into Russian
-            Translation translation =
-                    translate.translate(
-                            "Hello World",
-                            TranslateOption.sourceLanguage("en"),
-                            TranslateOption.targetLanguage("ru"));
-            return translation.getTranslatedText();
+            String text = chatBoxText.getText().toString();
+            try {
+                // Bad line of code below I know
+                TranslateOptions options = TranslateOptions.newBuilder().setApiKey("")
+                        .build();
+                Translate translate = options.getService();
+                final Translation translation = translate.translate(text, Translate.TranslateOption.targetLanguage(language));
+                return translation.getTranslatedText();
+            } catch (Exception e){
+                Log.i("ERROR", e.toString());
+                return "";
+            }
         }
 
         @Override
         protected void onPostExecute(final String translated) {
-            Log.i("RUSSIAN", translated);
+            chatBoxText.setText(translated);
+            receiveMessageView();
+            Log.i("Translated", translated);
         }
     }
 
