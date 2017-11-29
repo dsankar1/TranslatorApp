@@ -508,7 +508,7 @@ public class Chat extends Fragment {
             String text = chatBoxText.getText().toString();
             try {
                 // Bad line of code below I know
-                TranslateOptions options = TranslateOptions.newBuilder().setApiKey("")
+                TranslateOptions options = TranslateOptions.newBuilder().setApiKey("AIzaSyDhW6TDvQXd9FNPjPLU5lM2Z9sBmElknRM")
                         .build();
                 Translate translate = options.getService();
                 final Translation translation = translate.translate(text, Translate.TranslateOption.targetLanguage(language));
